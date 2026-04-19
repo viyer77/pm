@@ -7,5 +7,9 @@ services:
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
     volumes:
       - ./backend/app:/app/app
+      - pm_data:/app/data
     env_file:
       - .env
+
+volumes:
+  pm_data:

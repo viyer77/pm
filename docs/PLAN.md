@@ -2,12 +2,12 @@
 
 ## Part 1: Plan ✓
 
-**Status:** In Progress
+**Status:** Completed
 
 **Substeps:**
-- [ ] Enrich PLAN.md with detailed execution steps (THIS DOCUMENT)
-- [ ] Create frontend/AGENTS.md describing existing frontend code
-- [ ] User reviews and approves the plan
+- [x] Enrich PLAN.md with detailed execution steps (THIS DOCUMENT)
+- [x] Create frontend/AGENTS.md describing existing frontend code
+- [x] User reviews and approves the plan
 
 **Success Criteria:**
 - PLAN.md contains all 10 parts with substeps and tests
@@ -22,22 +22,23 @@
 ## Part 2: Docker Scaffolding
 
 **Objective:** Set up Docker infrastructure with working FastAPI backend serving hello-world HTML and supporting a test API call.
+**Status:** Completed
 
 **Substeps:**
-- [ ] Create Dockerfile with Python 3.12, uv package manager, FastAPI setup
-- [ ] Create docker-compose.yml for local development
-- [ ] Initialize FastAPI backend structure in `backend/` with:
-  - [ ] `backend/app/main.py` - FastAPI app entry point
-  - [ ] `backend/app/routes/` - API route directory
-  - [ ] `backend/requirements.txt` - Dependencies (fastapi, uvicorn)
-  - [ ] `backend/pyproject.toml` - uv configuration
-- [ ] Create `scripts/start.sh` (Mac/Linux) - Starts Docker container
-- [ ] Create `scripts/start.ps1` (Windows) - Starts Docker container
-- [ ] Create `scripts/stop.sh` (Mac/Linux) - Stops Docker container
-- [ ] Create `scripts/stop.ps1` (Windows) - Stops Docker container
-- [ ] Add hello-world static HTML at `/static/index.html`
-- [ ] Add test API route `/api/test` that returns JSON
-- [ ] Create README in docs/ explaining Docker setup
+- [x] Create Dockerfile with Python 3.12, uv package manager, FastAPI setup
+- [x] Create docker-compose.yml for local development
+- [x] Initialize FastAPI backend structure in `backend/` with:
+  - [x] `backend/app/main.py` - FastAPI app entry point
+  - [x] `backend/app/routes/` - API route directory
+  - [x] `backend/requirements.txt` - Dependencies (fastapi, uvicorn)
+  - [x] `backend/pyproject.toml` - uv configuration
+- [x] Create `scripts/start.sh` (Mac/Linux) - Starts Docker container
+- [x] Create `scripts/start.ps1` (Windows) - Starts Docker container
+- [x] Create `scripts/stop.sh` (Mac/Linux) - Stops Docker container
+- [x] Create `scripts/stop.ps1` (Windows) - Stops Docker container
+- [x] Add hello-world static HTML at `/static/index.html`
+- [x] Add test API route `/api/test` that returns JSON
+- [x] Create README in docs/ explaining Docker setup
 
 **Success Criteria:**
 - Docker image builds without errors
@@ -56,16 +57,17 @@
 ## Part 3: Integrate Frontend
 
 **Objective:** Build Next.js frontend to static files and serve at `/` through FastAPI.
+**Status:** Completed
 
 **Substeps:**
-- [ ] Add frontend build step to Dockerfile
-- [ ] Configure FastAPI to serve static Next.js build at `/`
-- [ ] Update Next.js build output to `frontend/out/` (static export)
-- [ ] Configure `next.config.ts` for standalone export
-- [ ] Copy built frontend to backend `static/` directory in Docker
-- [ ] Test frontend loads at `localhost:8000/`
-- [ ] Verify all frontend assets load correctly (CSS, JS, fonts)
-- [ ] Create integration tests for frontend asset loading
+- [x] Add frontend build step to Dockerfile
+- [x] Configure FastAPI to serve static Next.js build at `/`
+- [x] Update Next.js build output to `frontend/out/` (static export)
+- [x] Configure `next.config.ts` for standalone export
+- [x] Copy built frontend to backend `static/` directory in Docker
+- [x] Test frontend loads at `localhost:8000/`
+- [x] Verify all frontend assets load correctly (CSS, JS, fonts)
+- [x] Create integration tests for frontend asset loading
 
 **Success Criteria:**
 - Frontend serves at `localhost:8000/` with all styling intact
@@ -83,16 +85,17 @@
 ## Part 4: Authentication (Hardcoded)
 
 **Objective:** Add login/logout flow with hardcoded credentials ("user"/"password").
+**Status:** Completed
 
 **Substeps:**
-- [ ] Create `backend/app/routes/auth.py` with POST `/auth/login` endpoint
-- [ ] Implement session management (HTTP-only cookies or JWT)
-- [ ] Create login page frontend component
-- [ ] Add logout button to Kanban page
-- [ ] Protect Kanban route with auth middleware
-- [ ] Redirect unauthenticated users to login page
-- [ ] Implement session persistence across page reloads
-- [ ] Create tests for login/logout flow
+- [x] Create `backend/app/routes/auth.py` with POST `/auth/login` endpoint
+- [x] Implement session management (HTTP-only cookies or JWT)
+- [x] Create login page frontend component
+- [x] Add logout button to Kanban page
+- [x] Protect Kanban route with auth middleware
+- [x] Redirect unauthenticated users to login page
+- [x] Implement session persistence across page reloads
+- [x] Create tests for login/logout flow
 
 **Success Criteria:**
 - Visiting `localhost:8000/` redirects to login page
@@ -112,14 +115,15 @@
 ## Part 5: Database Schema
 
 **Objective:** Design SQLite schema for users, kanban boards, columns, and cards.
+**Status:** Completed
 
 **Substeps:**
-- [ ] Design schema: users, boards, columns, cards tables
-- [ ] Define relationships and constraints
-- [ ] Save schema as JSON document at `docs/DATABASE_SCHEMA.md`
-- [ ] Include migration strategy
-- [ ] Document sample queries
-- [ ] User reviews and approves schema
+- [x] Design schema: users, boards, columns, cards tables
+- [x] Define relationships and constraints
+- [x] Save schema as JSON document at `docs/DATABASE_SCHEMA.md`
+- [x] Include migration strategy
+- [x] Document sample queries
+- [x] User reviews and approves schema
 
 **Schema Overview:**
 ```
@@ -164,20 +168,21 @@ cards:
 ## Part 6: Backend API
 
 **Objective:** Build API routes for reading/updating Kanban data with database persistence.
+**Status:** Completed
 
 **Substeps:**
-- [ ] Create SQLAlchemy models for users, boards, columns, cards
-- [ ] Create `backend/app/database.py` - DB initialization (auto-create if missing)
-- [ ] Create API routes in `backend/app/routes/`:
-  - [ ] `GET /api/boards` - Get user's board
-  - [ ] `POST /api/columns` - Create column (rename)
-  - [ ] `POST /api/cards` - Create card
-  - [ ] `PUT /api/cards/{id}` - Update card
-  - [ ] `DELETE /api/cards/{id}` - Delete card
-  - [ ] `PUT /api/cards/{id}/move` - Move card to column
-- [ ] Add request validation with Pydantic models
-- [ ] Create comprehensive backend unit tests
-- [ ] Ensure database is auto-created on first run
+- [x] Create SQLAlchemy models for users, boards, columns, cards
+- [x] Create `backend/app/database.py` - DB initialization (auto-create if missing)
+- [x] Create API routes in `backend/app/routes/`:
+  - [x] `GET /api/boards` - Get user's board
+  - [x] `POST /api/columns` - Create column (rename)
+  - [x] `POST /api/cards` - Create card
+  - [x] `PUT /api/cards/{id}` - Update card
+  - [x] `DELETE /api/cards/{id}` - Delete card
+  - [x] `PUT /api/cards/{id}/move` - Move card to column
+- [x] Add request validation with Pydantic models
+- [x] Create comprehensive backend unit tests
+- [x] Ensure database is auto-created on first run
 
 **Success Criteria:**
 - All API routes respond correctly

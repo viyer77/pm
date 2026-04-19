@@ -2,12 +2,14 @@ from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
-from .routes import auth
+from .database import init_db
+from .routes import auth, boards
 
 app = FastAPI(title="Project Management MVP")
 
 # Include auth routes
 app.include_router(auth.router)
+app.include_router(boards.router)
 
 # Static directory path
 static_dir = Path(__file__).parent.parent / "static"
@@ -30,10 +32,14 @@ if (static_dir / "_next").exists():
 if (static_dir / "public").exists():
     app.mount("/public", StaticFiles(directory=static_dir / "public"), name="public")
 
+@app.on_event("startup")
+def startup() -> None:
+    init_db()
+
+
 def is_authenticated(request: Request) -> bool:
     """Check if request has valid session cookie"""
-    session_cookie = request.cookies.get("session")
-    return session_cookie == "authenticated"
+    return auth.is_request_authenticated(request)
 
 # Catch-all route handler for Next.js SPA routing
 @app.get("/{full_path:path}")

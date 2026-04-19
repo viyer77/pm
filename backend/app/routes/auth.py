@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Request, Response
+from fastapi import APIRouter, HTTPException, Request, Response, status
 from pydantic import BaseModel
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -13,6 +13,16 @@ class LoginRequest(BaseModel):
 class LoginResponse(BaseModel):
     success: bool
     message: str
+
+
+def is_request_authenticated(request: Request) -> bool:
+    session_cookie = request.cookies.get("session")
+    return session_cookie == "authenticated"
+
+
+def require_authenticated(request: Request) -> None:
+    if not is_request_authenticated(request):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
 
 @router.post("/login", response_model=LoginResponse)
 async def login(request: LoginRequest, response: Response):
@@ -37,8 +47,6 @@ async def logout(response: Response):
 
 @router.get("/check")
 async def check_auth(request: Request):
-    # Check if session cookie exists
-    session_cookie = request.cookies.get("session")
-    if session_cookie == "authenticated":
+    if is_request_authenticated(request):
         return {"authenticated": True}
     return {"authenticated": False}
