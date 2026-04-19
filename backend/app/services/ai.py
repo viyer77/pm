@@ -1,4 +1,4 @@
-"""OpenRouter AI service for LLM interactions"""
+"""OpenAI AI service for LLM interactions"""
 import os
 import logging
 import httpx
@@ -6,19 +6,19 @@ from typing import Optional
 
 logger = logging.getLogger(__name__)
 
-OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
-OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
-MODEL = "openai/gpt-4o-mini"  # Fallback to 4o-mini for cost; was "openai/gpt-oss-120b"
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+OPENAI_BASE_URL = "https://api.openai.com/v1"
+MODEL = "gpt-4o-mini"
 
 
 class AIService:
-    """Service for interacting with OpenRouter LLM API"""
+    """Service for interacting with OpenAI API"""
 
-    def __init__(self, api_key: str = OPENROUTER_API_KEY):
+    def __init__(self, api_key: str = OPENAI_API_KEY):
         if not api_key:
-            raise ValueError("OPENROUTER_API_KEY not found in environment")
+            raise ValueError("OPENAI_API_KEY not found in environment")
         self.api_key = api_key
-        self.base_url = OPENROUTER_BASE_URL
+        self.base_url = OPENAI_BASE_URL
         self.model = MODEL
         self.timeout = 30
 
