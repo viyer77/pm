@@ -1,4 +1,5 @@
 import unittest
+import random
 
 from fastapi.testclient import TestClient
 
@@ -89,6 +90,35 @@ class ApiFlowTests(unittest.TestCase):
         board_after_delete = self.client.get("/api/boards").json()
         remaining_ids = {card["id"] for card in board_after_delete["cards"]}
         self.assertNotIn(card_id, remaining_ids)
+
+    def test_move_card_is_stable_under_repeated_reorders(self) -> None:
+        self._login()
+        rng = random.Random(7)
+
+        for _ in range(50):
+            board = self.client.get("/api/boards").json()
+            cards = board["cards"]
+            columns = board["columns"]
+            self.assertGreater(len(cards), 0)
+            moving = rng.choice(cards)
+            target_column = rng.choice(columns)
+            target_count = len([card for card in cards if card["column_id"] == target_column["id"]])
+            target_position = rng.randint(0, target_count)
+
+            move_response = self.client.put(
+                f"/api/cards/{moving['id']}/move",
+                json={"column_id": target_column["id"], "position": target_position},
+            )
+            self.assertEqual(move_response.status_code, 200)
+
+        final_board = self.client.get("/api/boards").json()
+        cards_by_column: dict[int, list[int]] = {}
+        for card in final_board["cards"]:
+            cards_by_column.setdefault(card["column_id"], []).append(card["position"])
+
+        for positions in cards_by_column.values():
+            ordered = sorted(positions)
+            self.assertEqual(ordered, list(range(len(ordered))))
 
 
 if __name__ == "__main__":

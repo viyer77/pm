@@ -203,16 +203,17 @@ cards:
 ## Part 7: Frontend → Backend Integration
 
 **Objective:** Connect frontend to backend API for persistent Kanban board.
+**Status:** Completed
 
 **Substeps:**
-- [ ] Create frontend API client (`frontend/src/lib/api.ts`)
-- [ ] Replace mock data with backend calls
-- [ ] Implement optimistic updates for UX
-- [ ] Add error handling and retry logic
-- [ ] Handle loading/error states in UI
-- [ ] Create integration tests for API interactions
-- [ ] Test drag-and-drop persistence
-- [ ] Test card creation/deletion/editing persistence
+- [x] Create frontend API client (`frontend/src/lib/api.ts`)
+- [x] Replace mock data with backend calls
+- [x] Implement optimistic updates for UX
+- [x] Add error handling and retry logic
+- [x] Handle loading/error states in UI
+- [x] Create integration tests for API interactions
+- [x] Test drag-and-drop persistence
+- [x] Test card creation/deletion/editing persistence
 
 **Success Criteria:**
 - Kanban board loads from backend

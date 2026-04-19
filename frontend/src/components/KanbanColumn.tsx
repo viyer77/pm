@@ -11,6 +11,7 @@ type KanbanColumnProps = {
   onRename: (columnId: string, title: string) => void;
   onAddCard: (columnId: string, title: string, details: string) => void;
   onDeleteCard: (columnId: string, cardId: string) => void;
+  onUpdateCard: (cardId: string, title: string, details: string) => void;
 };
 
 export const KanbanColumn = ({
@@ -19,8 +20,19 @@ export const KanbanColumn = ({
   onRename,
   onAddCard,
   onDeleteCard,
+  onUpdateCard,
 }: KanbanColumnProps) => {
   const { setNodeRef, isOver } = useDroppable({ id: column.id });
+
+  const commitRename = (value: string) => {
+    const trimmed = value.trim();
+    if (!trimmed) {
+      return;
+    }
+    if (trimmed !== column.title) {
+      onRename(column.id, trimmed);
+    }
+  };
 
   return (
     <section
@@ -40,8 +52,14 @@ export const KanbanColumn = ({
             </span>
           </div>
           <input
-            value={column.title}
-            onChange={(event) => onRename(column.id, event.target.value)}
+            key={`${column.id}:${column.title}`}
+            defaultValue={column.title}
+            onBlur={(event) => commitRename(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                event.currentTarget.blur();
+              }
+            }}
             className="mt-3 w-full bg-transparent font-display text-lg font-semibold text-[var(--navy-dark)] outline-none"
             aria-label="Column title"
           />
@@ -54,6 +72,7 @@ export const KanbanColumn = ({
               key={card.id}
               card={card}
               onDelete={(cardId) => onDeleteCard(column.id, cardId)}
+              onUpdate={onUpdateCard}
             />
           ))}
         </SortableContext>

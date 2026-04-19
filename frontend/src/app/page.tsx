@@ -1,11 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { KanbanBoard } from "@/components/KanbanBoard";
 
 export default function Home() {
-  const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -164,7 +162,7 @@ export default function Home() {
         </div>
       </header>
       <main className="flex-1">
-        <KanbanBoard />
+        <KanbanBoard onUnauthorized={() => setIsAuthenticated(false)} />
       </main>
     </div>
   );

@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from pydantic import BaseModel, ConfigDict, Field
-from sqlalchemy import func
+from sqlalchemy import func, update
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from ..database import Board, Card, Column, User, get_db, utcnow_naive
@@ -194,33 +195,114 @@ def move_card(
     target_column = _get_column_for_board(db, board.id, payload.column_id)
 
     source_column_id = card.column_id
+    source_position = card.position
+    now = utcnow_naive()
+    stage_offset = 1000
 
-    if source_column_id == target_column.id:
-        cards = db.query(Card).filter(Card.column_id == source_column_id).order_by(Card.position.asc()).all()
-        ordered_ids = [item.id for item in cards if item.id != card.id]
-        target_index = min(payload.position, len(ordered_ids))
-        ordered_ids.insert(target_index, card.id)
+    try:
+        if source_column_id == target_column.id:
+            column_size = db.query(func.count(Card.id)).filter(Card.column_id == source_column_id).scalar() or 0
+            target_index = min(payload.position, max(column_size - 1, 0))
+            if target_index == source_position:
+                return card
 
-        id_to_card = {item.id: item for item in cards}
-        for idx, current_id in enumerate(ordered_ids):
-            current = id_to_card[current_id]
-            current.position = idx
-            current.updated_at = utcnow_naive()
-    else:
-        source_cards = db.query(Card).filter(Card.column_id == source_column_id).order_by(Card.position.asc()).all()
-        source_without_card = [item for item in source_cards if item.id != card.id]
-        for idx, source_card in enumerate(source_without_card):
-            source_card.position = idx
-            source_card.updated_at = utcnow_naive()
+            # Move the card out of the active position range to avoid unique collisions.
+            db.execute(
+                update(Card)
+                .where(Card.id == card.id)
+                .values(position=-1, updated_at=now)
+            )
 
-        target_cards = db.query(Card).filter(Card.column_id == target_column.id).order_by(Card.position.asc()).all()
-        target_index = min(payload.position, len(target_cards))
-        target_cards.insert(target_index, card)
-        for idx, target_card in enumerate(target_cards):
-            target_card.column_id = target_column.id
-            target_card.position = idx
-            target_card.updated_at = utcnow_naive()
+            if target_index > source_position:
+                db.execute(
+                    update(Card)
+                    .where(
+                        Card.column_id == source_column_id,
+                        Card.position >= source_position + 1,
+                        Card.position <= target_index,
+                    )
+                    .values(position=Card.position + stage_offset, updated_at=now)
+                )
+                db.execute(
+                    update(Card)
+                    .where(
+                        Card.column_id == source_column_id,
+                        Card.position >= source_position + 1 + stage_offset,
+                        Card.position <= target_index + stage_offset,
+                    )
+                    .values(position=Card.position - (stage_offset + 1), updated_at=now)
+                )
+            else:
+                db.execute(
+                    update(Card)
+                    .where(
+                        Card.column_id == source_column_id,
+                        Card.position >= target_index,
+                        Card.position <= source_position - 1,
+                    )
+                    .values(position=Card.position + stage_offset, updated_at=now)
+                )
+                db.execute(
+                    update(Card)
+                    .where(
+                        Card.column_id == source_column_id,
+                        Card.position >= target_index + stage_offset,
+                        Card.position <= source_position - 1 + stage_offset,
+                    )
+                    .values(position=Card.position - (stage_offset - 1), updated_at=now)
+                )
 
-    db.commit()
-    db.refresh(card)
-    return card
+            db.execute(
+                update(Card)
+                .where(Card.id == card.id)
+                .values(position=target_index, updated_at=now)
+            )
+        else:
+            target_count = db.query(func.count(Card.id)).filter(Card.column_id == target_column.id).scalar() or 0
+            target_index = min(payload.position, target_count)
+
+            # Park moved card first so source/target reindexing can happen safely.
+            db.execute(
+                update(Card)
+                .where(Card.id == card.id)
+                .values(position=-1, updated_at=now)
+            )
+
+            # Close source gap.
+            db.execute(
+                update(Card)
+                .where(Card.column_id == source_column_id, Card.position > source_position)
+                .values(position=Card.position + stage_offset, updated_at=now)
+            )
+            db.execute(
+                update(Card)
+                .where(Card.column_id == source_column_id, Card.position >= source_position + 1 + stage_offset)
+                .values(position=Card.position - (stage_offset + 1), updated_at=now)
+            )
+
+            # Open target slot.
+            db.execute(
+                update(Card)
+                .where(Card.column_id == target_column.id, Card.position >= target_index)
+                .values(position=Card.position + stage_offset, updated_at=now)
+            )
+            db.execute(
+                update(Card)
+                .where(Card.column_id == target_column.id, Card.position >= target_index + stage_offset)
+                .values(position=Card.position - (stage_offset - 1), updated_at=now)
+            )
+
+            # Move card into target slot.
+            db.execute(
+                update(Card)
+                .where(Card.id == card.id)
+                .values(column_id=target_column.id, position=target_index, updated_at=now)
+            )
+
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Unable to reorder cards")
+
+    moved_card = _get_card_for_board(db, board.id, card_id)
+    return moved_card
