@@ -18,6 +18,7 @@ import { createId, moveCard, type BoardData, type Card } from "@/lib/kanban";
 
 type KanbanBoardProps = {
   onUnauthorized?: () => void;
+  reloadTrigger?: number;
 };
 
 const toColumnUiId = (id: number) => `col-${id}`;
@@ -83,7 +84,7 @@ const toErrorMessage = (error: unknown) => {
   return "Something went wrong. Please try again.";
 };
 
-export const KanbanBoard = ({ onUnauthorized }: KanbanBoardProps) => {
+export const KanbanBoard = ({ onUnauthorized, reloadTrigger }: KanbanBoardProps) => {
   const [board, setBoard] = useState<BoardData | null>(null);
   const [activeCardId, setActiveCardId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -116,7 +117,7 @@ export const KanbanBoard = ({ onUnauthorized }: KanbanBoardProps) => {
 
   useEffect(() => {
     void loadBoard();
-  }, [loadBoard]);
+  }, [loadBoard, reloadTrigger]);
 
   const runOptimisticUpdate = async (
     nextBoard: BoardData,

@@ -126,5 +126,12 @@ export const api = {
       method: "PUT",
       body: JSON.stringify({ column_id: columnId, position }),
     }),
+  chatAI: (message: string) =>
+    requestJson<{ response: string; actions_executed: number }>("/api/ai/chat", {
+      method: "POST",
+      body: JSON.stringify({ message }),
+    }),
+  clearChatAI: () =>
+    requestJson<{ cleared: boolean }>("/api/ai/chat", { method: "DELETE" }),
 };
 

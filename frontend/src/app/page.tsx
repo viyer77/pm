@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { KanbanBoard } from "@/components/KanbanBoard";
+import { ChatSidebar } from "@/components/ChatSidebar";
 
 export default function Home() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
@@ -9,6 +10,7 @@ export default function Home() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [boardReloadTrigger, setBoardReloadTrigger] = useState(0);
 
   useEffect(() => {
     checkAuth();
@@ -149,8 +151,8 @@ export default function Home() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <header className="bg-[#032147] text-white p-4 shadow-lg">
+    <div className="flex flex-col h-screen overflow-hidden">
+      <header className="bg-[#032147] text-white p-4 shadow-lg flex-shrink-0">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <h1 className="text-2xl font-bold">Project Management</h1>
           <button
@@ -161,8 +163,14 @@ export default function Home() {
           </button>
         </div>
       </header>
-      <main className="flex-1">
-        <KanbanBoard onUnauthorized={() => setIsAuthenticated(false)} />
+      <main className="flex-1 flex overflow-hidden">
+        <div className="flex-1 overflow-y-auto">
+          <KanbanBoard
+            onUnauthorized={() => setIsAuthenticated(false)}
+            reloadTrigger={boardReloadTrigger}
+          />
+        </div>
+        <ChatSidebar onBoardChanged={() => setBoardReloadTrigger((n) => n + 1)} />
       </main>
     </div>
   );
