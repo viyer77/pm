@@ -234,14 +234,15 @@ cards:
 ## Part 8: AI Connectivity
 
 **Objective:** Establish connection to OpenRouter API and verify AI is working.
+**Status:** Completed
 
 **Substeps:**
-- [ ] Create `backend/app/services/ai.py` - OpenRouter integration
-- [ ] Load `OPENROUTER_API_KEY` from .env
-- [ ] Implement simple test route: `GET /api/ai/test` (ask AI "2+2")
-- [ ] Handle API errors and timeouts gracefully
-- [ ] Create unit tests for AI service
-- [ ] Log all AI interactions for debugging
+- [x] Create `backend/app/services/ai.py` - OpenRouter integration
+- [x] Load `OPENROUTER_API_KEY` from .env
+- [x] Implement simple test route: `GET /api/ai/test` (ask AI "2+2")
+- [x] Handle API errors and timeouts gracefully
+- [x] Create unit tests for AI service
+- [x] Log all AI interactions for debugging
 
 **Success Criteria:**
 - `curl localhost:8000/api/ai/test` returns AI response
@@ -260,20 +261,21 @@ cards:
 ## Part 9: Structured AI Output
 
 **Objective:** AI assistant receives Kanban board state and conversation history; returns structured output with text response + optional board updates.
+**Status:** Completed
 
 **Substeps:**
-- [ ] Define Structured Output schema (Pydantic model)
-  - [ ] `response: str` - AI's text response
-  - [ ] `actions: List[CardAction]` - Optional board changes
-- [ ] Create `POST /api/ai/chat` endpoint that:
-  - [ ] Accepts user message + conversation history
-  - [ ] Fetches current board state
-  - [ ] Calls AI with system prompt + board context
-  - [ ] Parses structured output
-  - [ ] Executes any card actions (create/update/move/delete)
-  - [ ] Returns response + updated board state
-- [ ] Implement conversation history storage (in-memory for MVP)
-- [ ] Create comprehensive tests for all action types
+- [x] Define Structured Output schema (Pydantic model)
+  - [x] `response: str` - AI's text response
+  - [x] `actions: List[CardAction]` - Optional board changes
+- [x] Create `POST /api/ai/chat` endpoint that:
+  - [x] Accepts user message + conversation history
+  - [x] Fetches current board state
+  - [x] Calls AI with system prompt + board context
+  - [x] Parses structured output
+  - [x] Executes any card actions (create/update/move/delete)
+  - [x] Returns response + updated board state
+- [x] Implement conversation history storage (in-memory for MVP)
+- [x] Create comprehensive tests for all action types
 - [ ] Document AI system prompt in docs/
 
 **Success Criteria:**

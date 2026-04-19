@@ -3,13 +3,14 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 from .database import init_db
-from .routes import auth, boards
+from .routes import auth, boards, ai
 
 app = FastAPI(title="Project Management MVP")
 
 # Include auth routes
 app.include_router(auth.router)
 app.include_router(boards.router)
+app.include_router(ai.router)
 
 # Static directory path
 static_dir = Path(__file__).parent.parent / "static"
