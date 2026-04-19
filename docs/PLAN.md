@@ -233,12 +233,12 @@ cards:
 
 ## Part 8: AI Connectivity
 
-**Objective:** Establish connection to OpenRouter API and verify AI is working.
+**Objective:** Establish connection to OpenAI API and verify AI is working.
 **Status:** Completed
 
 **Substeps:**
-- [x] Create `backend/app/services/ai.py` - OpenRouter integration
-- [x] Load `OPENROUTER_API_KEY` from .env
+- [x] Create `backend/app/services/ai.py` - OpenAI integration
+- [x] Load `OPENAI_API_KEY` from .env
 - [x] Implement simple test route: `GET /api/ai/test` (ask AI "2+2")
 - [x] Handle API errors and timeouts gracefully
 - [x] Create unit tests for AI service
@@ -276,7 +276,7 @@ cards:
   - [x] Returns response + updated board state
 - [x] Implement conversation history storage (in-memory for MVP)
 - [x] Create comprehensive tests for all action types
-- [ ] Document AI system prompt in docs/
+- [x] Document AI system prompt in docs/AI_SYSTEM_PROMPT.md
 
 **Success Criteria:**
 - AI can parse and execute card creation/update/move/delete
@@ -308,7 +308,7 @@ cards:
 - [x] Add loading states (animated dots) and error handling
 - [x] Implement board refresh when AI executes actions (reloadTrigger prop)
 - [x] Create responsive layout (sidebar + scrollable board)
-- [ ] Comprehensive frontend component tests
+- [x] Comprehensive frontend component tests (11 tests in ChatSidebar.test.tsx)
 
 **Success Criteria:**
 - Chat sidebar renders at 100% height on right side

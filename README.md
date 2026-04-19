@@ -6,16 +6,16 @@ A single-container Kanban board with an AI assistant. Built with FastAPI, Next.j
 
 - Drag-and-drop Kanban board with five columns
 - Persistent state (SQLite, survives container restarts)
-- AI chat sidebar powered by OpenRouter — ask it to modify your board in plain English
+- AI chat sidebar powered by OpenAI — ask it to modify your board in plain English
 - Session-based authentication
 
 ## Quick start
 
-**Requirements:** Docker, an [OpenRouter](https://openrouter.ai) API key.
+**Requirements:** Docker, an [OpenAI](https://platform.openai.com) API key.
 
 1. Create a `.env` file in the project root:
    ```
-   OPENROUTER_API_KEY=your_key_here
+   OPENAI_API_KEY=your_key_here
    ```
 
 2. Start the container:
@@ -52,7 +52,7 @@ The sidebar sends your message to `POST /api/ai/chat`. The backend:
 
 1. Fetches the current board state
 2. Builds a system prompt with column/card IDs and titles
-3. Calls OpenRouter (model: `openai/gpt-4o-mini`) in JSON mode
+3. Calls OpenAI (model: `gpt-4o-mini`) in JSON mode
 4. Parses a structured response: `{ response, actions[] }`
 5. Executes any card actions, then refreshes the board in the UI
 
@@ -93,5 +93,5 @@ npm run test:e2e
 |---|---|
 | Backend | Python 3.12, FastAPI, SQLAlchemy, SQLite |
 | Frontend | Next.js 16, TypeScript, Tailwind CSS, dnd-kit |
-| AI | OpenRouter API (JSON-mode structured output) |
+| AI | OpenAI API — `gpt-4o-mini`, JSON-mode structured output |
 | Container | Docker, uv package manager |
