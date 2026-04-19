@@ -8,6 +8,7 @@ from fastapi.testclient import TestClient
 from app.database import reset_db_for_tests
 from app.main import app
 from app.routes.ai import _conversation_history
+from app.routes.auth import _login_attempts, _sessions
 
 
 def _make_ai_response(response_text: str, actions: list = None) -> str:
@@ -17,6 +18,8 @@ def _make_ai_response(response_text: str, actions: list = None) -> str:
 class AITestRouteTests(unittest.TestCase):
     def setUp(self) -> None:
         reset_db_for_tests()
+        _sessions.clear()
+        _login_attempts.clear()
         self.client = TestClient(app)
 
     def _login(self) -> None:
@@ -59,8 +62,10 @@ class AITestRouteTests(unittest.TestCase):
 class AIChatRouteTests(unittest.TestCase):
     def setUp(self) -> None:
         reset_db_for_tests()
-        self.client = TestClient(app)
+        _sessions.clear()
+        _login_attempts.clear()
         _conversation_history.clear()
+        self.client = TestClient(app)
 
     def _login(self) -> None:
         self.client.post("/auth/login", json={"username": "user", "password": "password"})

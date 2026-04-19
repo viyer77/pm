@@ -137,13 +137,6 @@ export default function Home() {
               </button>
             </form>
 
-            <div className="mt-8 p-4 bg-blue-50 rounded-lg border border-blue-100">
-              <p className="text-xs text-[#888888] mb-2">
-                <strong>Demo Credentials:</strong>
-              </p>
-              <p className="text-xs text-[#888888]">Username: <code className="bg-white px-2 py-1 rounded">user</code></p>
-              <p className="text-xs text-[#888888]">Password: <code className="bg-white px-2 py-1 rounded">password</code></p>
-            </div>
           </div>
         </div>
       </div>

@@ -5,11 +5,14 @@ from fastapi.testclient import TestClient
 
 from app.database import reset_db_for_tests
 from app.main import app
+from app.routes.auth import _login_attempts, _sessions
 
 
 class ApiFlowTests(unittest.TestCase):
     def setUp(self) -> None:
         reset_db_for_tests()
+        _sessions.clear()
+        _login_attempts.clear()
         self.client = TestClient(app)
 
     def _login(self) -> None:

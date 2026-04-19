@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { api } from "@/lib/api";
+import { api, ApiError } from "@/lib/api";
+
+const CHAT_TIMEOUT_MS = 35_000;
 
 type Message = {
   id: string;
@@ -39,8 +41,11 @@ export const ChatSidebar = ({ onBoardChanged }: ChatSidebarProps) => {
     setLoading(true);
     setError(null);
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), CHAT_TIMEOUT_MS);
+
     try {
-      const res = await api.chatAI(text);
+      const res = await api.chatAI(text, controller.signal);
       setMessages((prev) => [
         ...prev,
         { id: `${Date.now()}-ai`, role: "assistant", content: res.response },
@@ -48,9 +53,24 @@ export const ChatSidebar = ({ onBoardChanged }: ChatSidebarProps) => {
       if (res.actions_executed > 0) {
         onBoardChanged();
       }
-    } catch {
-      setError("Failed to get a response. Please try again.");
+    } catch (err) {
+      if (controller.signal.aborted) {
+        setError("Request timed out. Please try again.");
+      } else if (err instanceof ApiError) {
+        if (err.status === 401) {
+          setError("Session expired. Please refresh and sign in.");
+        } else if (err.status === 429) {
+          setError("Too many requests. Please wait a moment.");
+        } else if (err.status >= 500) {
+          setError("Server error. Please try again later.");
+        } else {
+          setError("Failed to get a response. Please try again.");
+        }
+      } else {
+        setError("Network error. Please check your connection.");
+      }
     } finally {
+      clearTimeout(timeoutId);
       setLoading(false);
     }
   };

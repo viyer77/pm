@@ -110,7 +110,7 @@ describe("ChatSidebar", () => {
     await userEvent.click(screen.getByLabelText("Send message"));
 
     await waitFor(() =>
-      expect(screen.getByText(/failed to get a response/i)).toBeInTheDocument()
+      expect(screen.getByText(/network error/i)).toBeInTheDocument()
     );
   });
 
@@ -123,7 +123,7 @@ describe("ChatSidebar", () => {
     render(<ChatSidebar onBoardChanged={vi.fn()} />);
     await userEvent.type(screen.getByLabelText("Message input"), "hello{Enter}");
 
-    expect(api.chatAI).toHaveBeenCalledWith("hello");
+    expect(api.chatAI).toHaveBeenCalledWith("hello", expect.any(AbortSignal));
   });
 
   it("does not send on Shift+Enter", async () => {

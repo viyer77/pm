@@ -8,8 +8,8 @@ from typing import Generator
 from sqlalchemy import DateTime, ForeignKey, Integer, String, Text, UniqueConstraint, create_engine, func
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, relationship, sessionmaker
 
-DEFAULT_USERNAME = "user"
-DEFAULT_PASSWORD_HASH = "password"
+DEFAULT_USERNAME = os.getenv("APP_USERNAME", "user")
+DEFAULT_PASSWORD_HASH = os.getenv("APP_PASSWORD", "password")
 DEFAULT_BOARD_TITLE = "My Project Board"
 DEFAULT_COLUMN_TITLES = ["Backlog", "Discovery", "In Progress", "Review", "Done"]
 DEFAULT_CARD_SEED = {
@@ -122,6 +122,9 @@ def get_db() -> Generator[Session, None, None]:
     db = SessionLocal()
     try:
         yield db
+    except Exception:
+        db.rollback()
+        raise
     finally:
         db.close()
 

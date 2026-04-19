@@ -1,14 +1,16 @@
 """OpenAI AI service for LLM interactions"""
-import os
 import logging
-import httpx
+import os
 from typing import Optional
+
+import httpx
 
 logger = logging.getLogger(__name__)
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 OPENAI_BASE_URL = "https://api.openai.com/v1"
-MODEL = "gpt-4o-mini"
+MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+TEMPERATURE = float(os.getenv("OPENAI_TEMPERATURE", "0.7"))
 
 
 class AIService:
@@ -20,6 +22,7 @@ class AIService:
         self.api_key = api_key
         self.base_url = OPENAI_BASE_URL
         self.model = MODEL
+        self.temperature = TEMPERATURE
         self.timeout = 30
 
     async def _post(self, messages: list[dict], json_mode: bool = False) -> str:
@@ -30,7 +33,7 @@ class AIService:
         payload: dict = {
             "model": self.model,
             "messages": messages,
-            "temperature": 0.7,
+            "temperature": self.temperature,
             "max_tokens": 1000,
         }
         if json_mode:
@@ -71,12 +74,10 @@ class AIService:
         return await self._post(messages, json_mode=True)
 
 
-# Global instance
 _ai_service: Optional[AIService] = None
 
 
 def get_ai_service() -> AIService:
-    """Get or initialize the AI service"""
     global _ai_service
     if _ai_service is None:
         _ai_service = AIService()

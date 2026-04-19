@@ -86,6 +86,10 @@ async function requestJson<T>(
       if (error instanceof ApiError) {
         throw error;
       }
+      // Don't retry if request was intentionally aborted
+      if (init.signal?.aborted) {
+        throw new ApiError("Request aborted", 0);
+      }
       if (attempt >= retries) {
         throw new ApiError("Network error", 0);
       }
@@ -126,10 +130,11 @@ export const api = {
       method: "PUT",
       body: JSON.stringify({ column_id: columnId, position }),
     }),
-  chatAI: (message: string) =>
+  chatAI: (message: string, signal?: AbortSignal) =>
     requestJson<{ response: string; actions_executed: number }>("/api/ai/chat", {
       method: "POST",
       body: JSON.stringify({ message }),
+      signal,
     }),
   clearChatAI: () =>
     requestJson<{ cleared: boolean }>("/api/ai/chat", { method: "DELETE" }),

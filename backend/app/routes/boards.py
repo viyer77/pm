@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request, status
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import func, update
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from ..database import Board, Card, Column, User, get_db, utcnow_naive
 from .auth import VALID_USERNAME, require_authenticated
@@ -79,13 +79,18 @@ def _get_user_board(db: Session, user: User) -> Board:
 
 
 def _build_board_response(db: Session, board: Board) -> BoardResponse:
-    columns = db.query(Column).filter(Column.board_id == board.id).order_by(Column.position.asc()).all()
-    column_ids = [column.id for column in columns]
-
-    cards_query = db.query(Card).filter(Card.column_id.in_(column_ids)) if column_ids else db.query(Card).filter(False)
-    cards = cards_query.order_by(Card.column_id.asc(), Card.position.asc()).all()
-
-    return BoardResponse(id=board.id, title=board.title, columns=columns, cards=cards)
+    board_loaded = (
+        db.query(Board)
+        .options(joinedload(Board.columns).joinedload(Column.cards))
+        .filter(Board.id == board.id)
+        .first()
+    )
+    columns = sorted(board_loaded.columns, key=lambda c: c.position)
+    cards = sorted(
+        [card for col in columns for card in col.cards],
+        key=lambda c: (c.column_id, c.position),
+    )
+    return BoardResponse(id=board_loaded.id, title=board_loaded.title, columns=columns, cards=cards)
 
 
 def _get_column_for_board(db: Session, board_id: int, column_id: int) -> Column:
